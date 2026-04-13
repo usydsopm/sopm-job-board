@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SoPM Job Board</title>
+
+  <style>
+    :root {
+      --ochre: #e64626;
+      --charcoal: #414042;
+      --cream: #fcede2;
+      --white: #ffffff;
+      --light-border: #e6ddd7;
+      --muted-text: #666666;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--cream);
+      color: var(--charcoal);
+      font-family: "Apercu Pro", "Apercu", "Segoe UI", Arial, sans-serif;
+      line-height: 1.5;
+    }
+
+    .header {
+      background: var(--charcoal);
+      color: var(--white);
+      padding: 24px 20px;
+    }
+
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .header-logo {
+      height: 52px;
+      width: auto;
+      display: block;
+    }
+
+    .header-text h1 {
+      margin: 0;
+      font-size: 2rem;
+      font-weight: 400;
+      font-family: "Lyon Display Medium", "Georgia", serif;
+      letter-spacing: 0.2px;
+    }
+
+    .header-text p {
+      margin: 6px 0 0 0;
+      font-size: 0.98rem;
+      opacity: 0.92;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px 20px 40px;
+    }
+
+    .results-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .results-count {
+      font-size: 0.95rem;
+      color: var(--muted-text);
+    }
+
+    .jobs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 18px;
+    }
+
+    .job-card {
+      background: var(--white);
+      border: 1px solid var(--light-border);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 250px;
+min-width: 300px;
+    }
+
+    .job-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    .badge {
+      align-self: flex-start;
+      background: var(--cream);
+      color: var(--ochre);
+      border: 1px solid rgba(230, 70, 38, 0.25);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .job-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .company-logo {
+      width: 64px;
+      height: 64px;
+      border-radius: 12px;
+      object-fit: contain;
+      background: #fff;
+      border: 1px solid #eee;
+      padding: 6px;
+      flex-shrink: 0;
+    }
+
+    .logo-placeholder {
+      width: 64px;
+      height: 64px;
+      border-radius: 12px;
+      background: #f4f1ee;
+      color: var(--charcoal);
+      border: 1px solid #eee;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .job-title {
+      margin: 0 0 4px 0;
+      font-family: "Lyon Display Medium", "Georgia", serif;
+      font-size: 1.2rem;
+      line-height: 1.25;
+      color: var(--charcoal);
+      font-weight: 400;
+    }
+
+    .company-name {
+      margin: 0;
+      font-size: 0.97rem;
+      color: var(--muted-text);
+    }
+
+    .job-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .meta-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #faf8f6;
+      border: 1px solid #eee4de;
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 0.75rem;
+      color: var(--charcoal);
+    }
+
+    .job-description {
+  font-size: 0.85rem;
+  color: var(--muted-text);
+  margin-top: 6px;
+}
+    }
+
+  .job-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid #eee4de;
+}
+
+    .posted-date {
+      font-size: 0.85rem;
+      color: var(--muted-text);
+    }
+
+ .apply-button {
+margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  background: var(--ochre);
+  color: var(--white);
+  padding: 12px 18px;
+  border-radius: 999px;
+  border: 1px solid var(--ochre);
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+}
+
+.apply-button:hover {
+  background: var(--white);
+  color: var(--ochre);
+  transform: translateY(-1px);
+}
+
+    .empty-state,
+    .error-state,
+    .loading-state {
+      background: var(--white);
+      border: 1px solid var(--light-border);
+      border-radius: 16px;
+      padding: 28px;
+      text-align: center;
+      color: var(--muted-text);
+    }
+
+    .more-jobs-section {
+      margin-top: 36px;
+    }
+
+    .more-jobs-heading {
+  margin: 0 0 16px 0;
+  font-family: "Lyon Display Medium", "Georgia", serif;
+  font-size: 1.3rem;
+  font-weight: 400;
+  color: var(--charcoal);
+  text-align: center;
+}
+
+   .more-jobs-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 18px;
+}
+
+ .more-jobs-button {
+  display: flex;
+  flex-direction: column;   /* 👈 stack vertically */
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--ochre);
+  color: #ffffff;
+  text-decoration: none;
+  padding: 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  width: 100%;
+  text-align: center;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+    .more-jobs-button:hover {
+      opacity: 0.92;
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 640px) {
+      .header-text h1 {
+        font-size: 1.6rem;
+      }
+
+      .jobs-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .container {
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+
+      .header {
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+
+      .more-jobs-buttons {
+        flex-direction: column;
+      }
+
+      .more-jobs-button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+.disclaimer {
+  margin-top: 40px;
+  padding: 20px;
+  font-size: 0.8rem;
+  color: #666;
+  border-top: 1px solid #e0e0e0;
+  line-height: 1.5;
+}
+
+.disclaimer p {
+  margin-bottom: 10px;
+}
+
+.logo-box {
+  width: 150px;
+  height: 60px;
+  background: #ffffff;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #eee;
+}
+
+.more-jobs-button img {
+  max-width: 80%;
+  max-height: 70%;
+  object-fit: contain;
+}
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-inner">
+      <img src="logo.png" alt="University logo" class="header-logo">
+      <div class="header-text">
+        <h1>SoPM Job Board</h1>
+<p>Explore curated project management roles to kickstart your career 🚀✨</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="results-bar">
+      <div class="results-count" id="resultsCount">Loading opportunities...</div>
+    </div>
+
+    <div id="jobsContainer" class="jobs-grid"></div>
+
+    <div class="more-jobs-section">
+      <h2 class="more-jobs-heading">Explore more opportunities</h2>
+      <div class="more-jobs-buttons">
+ <a class="more-jobs-button" href="https://www.seek.com.au/project-management-jobs" target="_blank">
+<span>See more jobs on Seek</span>
+<div class="logo-box">
+  <img src="seek.png" alt="Seek logo">
+</div>
+</a>
+
+<a class="more-jobs-button" href="https://au.indeed.com/jobs?q=project+management" target="_blank">
+ <span>See more jobs on Indeed</span>
+<div class="logo-box">
+  <img src="indeed.png" alt="Indeed logo">
+</div>
+</a>
+
+<a class="more-jobs-button" href="https://www.linkedin.com/jobs/project-management-jobs/" target="_blank">
+ <span>See more jobs on LinkedIn</span>
+<div class="logo-box">
+  <img src="linkedin.png" alt="LinkedIn logo">
+</div>
+</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "https://script.googleusercontent.com/macros/echo?user_content_key=AWDtjMVtgODzt8cAMXqZKOFGLdK9Wqy-N1R0FLOy12XghPc0mqmsk5reLy7srtwTkLPIJR9s9vM5TGlqOAYb8qxDCS1MzeG4apAOczkvHicg3T8M4taoh4jeExoDE_dfpA2d0M0Dwv0cyWfoUZcCaX0gA-sp_41zKXNeI4Jg7mLkpqJBxojK7Gg9OApWF4RFH6ej0aOgdB70NLishoqGkfKwvosG-ySiMiykQs-vOwhmYbWN1BhoeV2LG-82PcUOPr46HH7CFAILRiKtGFMhNzVUvPPMCxn9_Q&lib=M_1v6ZZq9C2p5Uf23h_9Ins84nNefdry-";
+
+    let allJobs = [];
+
+    function escapeHtml(text) {
+      if (text === null || text === undefined) return "";
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function daysAgoText(dateString) {
+      if (!dateString) return "Date not provided";
+
+      const jobDate = new Date(dateString);
+      if (isNaN(jobDate.getTime())) return dateString;
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      jobDate.setHours(0, 0, 0, 0);
+
+      const diffTime = today - jobDate;
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+      if (diffDays < 0) return "Recently added";
+      if (diffDays === 0) return "Posted today";
+      if (diffDays === 1) return "Posted 1 day ago";
+      return `Posted ${diffDays} days ago`;
+    }
+
+    function sortJobsByDate(jobs) {
+      return jobs.sort((a, b) => {
+        const dateA = new Date(a.Date);
+        const dateB = new Date(b.Date);
+        return dateB - dateA;
+      });
+    }
+
+    function getInitials(name) {
+      if (!name) return "•";
+      return name
+        .split(" ")
+        .slice(0, 2)
+        .map(word => word.charAt(0).toUpperCase())
+        .join("");
+    }
+
+    function renderJobs(jobs) {
+      const container = document.getElementById("jobsContainer");
+      const resultsCount = document.getElementById("resultsCount");
+
+      resultsCount.textContent = `${jobs.length} opportunit${jobs.length === 1 ? "y" : "ies"} found`;
+
+      if (jobs.length === 0) {
+        container.className = "";
+        container.innerHTML = '<div class="empty-state">No opportunities available right now.</div>';
+        return;
+      }
+
+      container.className = "jobs-grid";
+      container.innerHTML = jobs.map(job => {
+        const title = escapeHtml(job.Title || "Untitled role");
+        const company = escapeHtml(job.Company || "Unknown employer");
+        const location = escapeHtml(job.Location || "Location not listed");
+        const salary = escapeHtml(job.Salary || "Salary not listed");
+const timeType = escapeHtml(job["Time Type"] || "Not specified");
+        const link = job.Link || "#";
+        const featured = String(job.Featured).toUpperCase() === "TRUE";
+        const logo = job.Logo ? String(job.Logo).trim() : "";
+        const summary = escapeHtml(job.Summary || job.Description || "");
+        const postedText = daysAgoText(job.Date);
+
+        const logoHtml = logo
+          ? `<img src="${logo}" alt="${company} logo" class="company-logo" onerror="this.outerHTML='<div class=&quot;logo-placeholder&quot;>${getInitials(company)}</div>'">`
+          : `<div class="logo-placeholder">${getInitials(company)}</div>`;
+
+        return `
+          <div class="job-card">
+            ${featured ? '<div class="badge">Featured</div>' : ""}
+            
+            <div class="job-top">
+              ${logoHtml}
+              <div>
+                <h2 class="job-title">${title}</h2>
+                <p class="company-name">${company}</p>
+              </div>
+            </div>
+
+            <div class="job-meta">
+              <span class="meta-pill">📍 ${location}</span>
+<span class="meta-pill">🕓 ${timeType}</span>
+              <span class="meta-pill">💰 ${salary}</span>
+            </div>
+
+            ${summary ? `<div class="job-description">${summary}</div>` : ""}
+
+           <div class="job-actions">
+  <span class="posted-date">${postedText}</span>
+  <a class="apply-button" href="${link}" target="_blank">APPLY NOW</a>
+</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function showLoading() {
+      document.getElementById("jobsContainer").className = "";
+      document.getElementById("jobsContainer").innerHTML =
+        '<div class="loading-state">Loading opportunities...</div>';
+    }
+
+    function showError() {
+      document.getElementById("resultsCount").textContent = "Unable to load opportunities";
+      document.getElementById("jobsContainer").className = "";
+      document.getElementById("jobsContainer").innerHTML =
+        '<div class="error-state">There was a problem loading the job board. Check your Google Apps Script URL and sharing settings.</div>';
+    }
+
+    async function loadJobs() {
+      showLoading();
+
+      try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+
+        if (!Array.isArray(data)) {
+          throw new Error("Invalid data format");
+        }
+
+        allJobs = sortJobsByDate(data);
+        renderJobs(allJobs);
+      } catch (error) {
+        console.error(error);
+        showError();
+      }
+    }
+
+    loadJobs();
+  </script>
+<div class="disclaimer">
+  <p>
+    This job board is provided for general informational purposes only and does not represent an exhaustive list of project management opportunities. Roles are selected as examples that may be relevant to current and graduating students. 
+    The University is not affiliated with, endorsing, or acting on behalf of any of the organisations listed. Inclusion of a role does not constitute a recommendation or endorsement of the employer, position, or working conditions.
+     Salary information is indicative only and has been estimated where not publicly provided by the employer. Actual remuneration may vary.
+      Students are responsible for conducting their own due diligence before applying for or accepting any role. The University accepts no responsibility or liability for any loss, damage, or outcomes arising from the use of this job board.
+  </p>
+<p style="font-weight: 700;">
+  For feedback or questions, please contact 
+  <a href="mailto:project.management@sydney.edu.au">project.management@sydney.edu.au</a>
+</p>
+</div>
+</body>
+</html>
