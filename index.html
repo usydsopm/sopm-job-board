@@ -506,7 +506,7 @@ const timeType = escapeHtml(job["Time Type"] || "Not specified");
       document.getElementById("resultsCount").textContent = "Unable to load opportunities";
       document.getElementById("jobsContainer").className = "";
       document.getElementById("jobsContainer").innerHTML =
-        '<div class="error-state">There was a problem loading the job board. Check your Google Apps Script URL and sharing settings.</div>';
+        '<div class="error-state">There was a problem loading the job board. Refresh the page. If the problem persists, please contact project.management@sydney.edu.au.</div>';
     }
 
     async function loadJobs() {
