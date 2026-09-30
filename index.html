@@ -6,6 +6,11 @@
   <title>SoPM Job Board</title>
 
   <style>
+    /* Zoom the whole job board out to 85% so cards and text look smaller inside the Canvas iframe */
+    html {
+      zoom: 0.85;
+    }
+
     :root {
       --ochre: #e64626;
       --charcoal: #414042;
@@ -188,7 +193,6 @@ min-width: 300px;
   color: var(--muted-text);
   margin-top: 6px;
 }
-    }
 
   .job-actions {
   display: flex;
@@ -429,6 +433,28 @@ margin-left: auto;
       });
     }
 
+    // Makes company logo links more likely to load inside an iframe
+    function normalizeLogoUrl(raw) {
+      if (!raw) return "";
+      let url = String(raw).trim();
+      if (!url) return "";
+
+      // protocol-relative or insecure links -> https (http images are blocked on an https page)
+      if (url.startsWith("//")) url = "https:" + url;
+      if (url.startsWith("http://")) url = "https://" + url.slice(7);
+
+      // Google Drive share links are web pages, not images -> use the thumbnail address
+      let m = url.match(/drive\.google\.com\/file\/d\/([^\/?#]+)/) ||
+              url.match(/drive\.google\.com\/(?:open|uc)\?[^#]*?id=([^&#]+)/);
+      if (m) return "https://drive.google.com/thumbnail?id=" + m[1] + "&sz=w200";
+
+      // Dropbox share links -> direct image
+      if (/dropbox\.com/.test(url)) {
+        url = url.replace(/([?&])dl=0/, "$1raw=1");
+      }
+      return url;
+    }
+
     function getInitials(name) {
       if (!name) return "•";
       return name
@@ -459,12 +485,12 @@ margin-left: auto;
 const timeType = escapeHtml(job["Time Type"] || "Not specified");
         const link = job.Link || "#";
         const featured = String(job.Featured).toUpperCase() === "TRUE";
-        const logo = job.Logo ? String(job.Logo).trim() : "";
+        const logo = normalizeLogoUrl(job.Logo);
         const summary = escapeHtml(job.Summary || job.Description || "");
         const postedText = daysAgoText(job.Date);
 
         const logoHtml = logo
-          ? `<img src="${logo}" alt="${company} logo" class="company-logo" onerror="this.outerHTML='<div class=&quot;logo-placeholder&quot;>${getInitials(company)}</div>'">`
+          ? `<img src="${escapeHtml(logo)}" alt="${company} logo" class="company-logo" referrerpolicy="no-referrer" data-initials="${escapeHtml(getInitials(company))}">`
           : `<div class="logo-placeholder">${getInitials(company)}</div>`;
 
         return `
@@ -494,6 +520,18 @@ const timeType = escapeHtml(job["Time Type"] || "Not specified");
           </div>
         `;
       }).join("");
+
+      // If a logo fails to load, swap in the company's initials instead
+      container.querySelectorAll("img.company-logo").forEach(img => {
+        const useInitials = () => {
+          const ph = document.createElement("div");
+          ph.className = "logo-placeholder";
+          ph.textContent = img.dataset.initials || "•";
+          img.replaceWith(ph);
+        };
+        img.addEventListener("error", useInitials, { once: true });
+        if (img.complete && img.naturalWidth === 0) useInitials();
+      });
     }
 
     function showLoading() {
